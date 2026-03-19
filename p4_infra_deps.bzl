@@ -8,6 +8,7 @@ Please read carefully before adding new dependencies:
   p4-infra. Prefer releases over arbitrary commits when both are available.
 """
 
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def p4_infra_deps():
@@ -28,16 +29,11 @@ def p4_infra_deps():
             url = "https://github.com/bazelbuild/buildtools/archive/refs/tags/5.1.0.tar.gz",
         )
     if not native.existing_rule("com_github_nelhage_rules_boost"):
-        # This version includes the fix for boost failures due to the xz library issue.
         http_archive(
             name = "com_github_nelhage_rules_boost",
             url = "https://github.com/nelhage/rules_boost/archive/5160325dbdc8c9e499f9d9917d913f35f1785d52.zip",
             strip_prefix = "rules_boost-5160325dbdc8c9e499f9d9917d913f35f1785d52",
             sha256 = "feb4b1294684c79df7c1e08f1aec5da0da52021e33db59c88edbe86b4d1a017a",
-            patch_args = ["-p1"],
-            patches = [
-                "@com_google_gutil//:bazel/patches/boost-001-temp_fix_for_build_failure.patch",
-            ],
         )
     if not native.existing_rule("com_github_grpc_grpc"):
         http_archive(
@@ -45,12 +41,6 @@ def p4_infra_deps():
             url = "https://github.com/grpc/grpc/archive/v1.63.0.zip",
             strip_prefix = "grpc-1.63.0",
             sha256 = "daa1b06a19b5f7e4603e1f8980eeab43cf69b6e89bee3b2547f275fa5af7f480",
-            patch_args = ["-p1"],
-            # TODO(b/411119415): This patch will be removed once we switch over to bzlmod and
-            # upgrade the grpc version.
-            patches = [
-                "@com_google_gutil//:bazel/patches/grpc-003-fix_go_gazelle_register_toolchain.patch",
-            ],
         )
     if not native.existing_rule("com_google_absl"):
         http_archive(
@@ -88,12 +78,10 @@ def p4_infra_deps():
             sha256 = "406b64643eede84ce3e0821a1d01f66eaf6254e79cb9c4f53be9054551935e79",
         )
     if not native.existing_rule("com_google_gutil"):
-        http_archive(
+        git_repository(
             name = "com_google_gutil",
-            # Newest commit on main as of 2025-12-11.
-            url = "https://github.com/google/gutil/archive/4aaf6e6279df0c9420aa983ea39203bb24100b65.zip",
-            strip_prefix = "gutil-4aaf6e6279df0c9420aa983ea39203bb24100b65",
-            sha256 = "e3b1bc9607e27c9e2c44a2c370da7f1d819c25d065792849b34a52317188afc4",
+            remote = "https://github.com/google/gutil",
+            branch = "bazel-workspace-support",
         )
     if not native.existing_rule("com_github_otg_models"):
         http_archive(
@@ -124,22 +112,16 @@ def p4_infra_deps():
             sha256 = "991ff13a0b28f2cdc2ccb123261e7554d9bcd95c00a127411939a3a8c8a9cc62",
         )
     if not native.existing_rule("com_github_p4lang_p4c"):
-        http_archive(
+        git_repository(
             name = "com_github_p4lang_p4c",
-            # Newest commit on main on 2024-08-01.
-            url = "https://github.com/p4lang/p4c/archive/44dbcda9c7e3d26d24baadb884b31b32d215edef.zip",
-            strip_prefix = "p4c-44dbcda9c7e3d26d24baadb884b31b32d215edef",
-            sha256 = "ae4d53d0fd41572c38b03e881a8e2d2e472df246f75d6a64555f9ff1b656b574",
+            remote = "https://github.com/p4lang/p4c",
+            branch = "bazel-workspace-support",
         )
     if not native.existing_rule("com_github_p4lang_p4runtime"):
-        # We frequently need bleeding-edge, unreleased version of P4Runtime, so we use a commit
-        # rather than a release.
-        http_archive(
+        git_repository(
             name = "com_github_p4lang_p4runtime",
-            # Newest commit on main as of 2025-10-17.
-            urls = ["https://github.com/p4lang/p4runtime/archive/f5187a26cd8745cae1b8a48bcdddddc00ec85e22.zip"],
-            strip_prefix = "p4runtime-f5187a26cd8745cae1b8a48bcdddddc00ec85e22/proto",
-            sha256 = "ec894c1458a3a9504e98e4f6cc0683ddb2307d1aa229807819b2d8edab963b04",
+            remote = "https://github.com/p4lang/p4runtime",
+            branch = "bazel-workspace-support",
         )
     if not native.existing_rule("com_github_p4lang_p4_constraints"):
         # This commit is from https://github.com/p4lang/p4-constraints/pull/177.
