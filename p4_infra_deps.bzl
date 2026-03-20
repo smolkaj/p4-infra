@@ -13,35 +13,9 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def p4_infra_deps():
     """Sets up 3rd party workspaces needed to build P4 infrastructure."""
-    if not native.existing_rule("rules_cc"):
-        http_archive(
-            name = "rules_cc",
-            sha256 = "b8b918a85f9144c01f6cfe0f45e4f2838c7413961a8ff23bc0c6cdf8bb07a3b6",
-            strip_prefix = "rules_cc-0.1.5",
-            url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.5/rules_cc-0.1.5.tar.gz",
-        )
 
-    if not native.existing_rule("com_github_bazelbuild_buildtools"):
-        http_archive(
-            name = "com_github_bazelbuild_buildtools",
-            sha256 = "e3bb0dc8b0274ea1aca75f1f8c0c835adbe589708ea89bf698069d0790701ea3",
-            strip_prefix = "buildtools-5.1.0",
-            url = "https://github.com/bazelbuild/buildtools/archive/refs/tags/5.1.0.tar.gz",
-        )
-    if not native.existing_rule("com_github_nelhage_rules_boost"):
-        http_archive(
-            name = "com_github_nelhage_rules_boost",
-            url = "https://github.com/nelhage/rules_boost/archive/5160325dbdc8c9e499f9d9917d913f35f1785d52.zip",
-            strip_prefix = "rules_boost-5160325dbdc8c9e499f9d9917d913f35f1785d52",
-            sha256 = "feb4b1294684c79df7c1e08f1aec5da0da52021e33db59c88edbe86b4d1a017a",
-        )
-    if not native.existing_rule("com_github_grpc_grpc"):
-        http_archive(
-            name = "com_github_grpc_grpc",
-            url = "https://github.com/grpc/grpc/archive/v1.63.0.zip",
-            strip_prefix = "grpc-1.63.0",
-            sha256 = "daa1b06a19b5f7e4603e1f8980eeab43cf69b6e89bee3b2547f275fa5af7f480",
-        )
+    # -- Direct dependencies ---------------------------------------------------
+
     if not native.existing_rule("com_google_absl"):
         http_archive(
             name = "com_google_absl",
@@ -56,19 +30,19 @@ def p4_infra_deps():
             strip_prefix = "googletest-release-1.11.0",
             sha256 = "b4870bf121ff7795ba20d20bcdd8627b8e088f2d1dab299a031c1034eddc93d5",
         )
-    if not native.existing_rule("com_google_benchmark"):
-        http_archive(
-            name = "com_google_benchmark",
-            urls = ["https://github.com/google/benchmark/archive/v1.5.4.tar.gz"],
-            strip_prefix = "benchmark-1.5.4",
-            sha256 = "e3adf8c98bb38a198822725c0fc6c0ae4711f16fbbf6aeb311d5ad11e5a081b5",
-        )
     if not native.existing_rule("com_google_protobuf"):
         http_archive(
             name = "com_google_protobuf",
-            url = "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v25.2.zip",
-            strip_prefix = "protobuf-25.2",
-            sha256 = "ddd0f5271f31b549efc74eb39061e142132653d5d043071fcec265bd571e73c4",
+            url = "https://github.com/protocolbuffers/protobuf/releases/download/v28.2/protobuf-28.2.tar.gz",
+            strip_prefix = "protobuf-28.2",
+            sha256 = "b2340aa47faf7ef10a0328190319d3f3bee1b24f426d4ce8f4253b6f27ce16db",
+        )
+    if not native.existing_rule("com_github_grpc_grpc"):
+        http_archive(
+            name = "com_github_grpc_grpc",
+            url = "https://github.com/grpc/grpc/archive/v1.63.0.zip",
+            strip_prefix = "grpc-1.63.0",
+            sha256 = "daa1b06a19b5f7e4603e1f8980eeab43cf69b6e89bee3b2547f275fa5af7f480",
         )
     if not native.existing_rule("com_google_googleapis"):
         http_archive(
@@ -81,81 +55,47 @@ def p4_infra_deps():
         git_repository(
             name = "com_google_gutil",
             remote = "https://github.com/google/gutil",
-            branch = "bazel-workspace-support",
-        )
-    if not native.existing_rule("com_github_otg_models"):
-        http_archive(
-            name = "com_github_otg_models",
-            url = "https://github.com/open-traffic-generator/models/archive/refs/tags/v0.12.5.zip",
-            strip_prefix = "models-0.12.5",
-            build_file = "@//:bazel/BUILD.otg-models.bazel",
-            sha256 = "1a63e769f1d7f42c79bc1115babf54acbc44761849a77ac28f47a74567f10090",
-        )
-    if not native.existing_rule("com_github_gnmi"):
-        http_archive(
-            name = "com_github_gnmi",
-            # v0.10.0 release; commit-hash:5473f2ef722ee45c3f26eee3f4a44a7d827e3575.
-            url = "https://github.com/openconfig/gnmi/archive/refs/tags/v0.10.0.zip",
-            strip_prefix = "gnmi-0.10.0",
-            patch_args = ["-p1"],
-            patches = [
-                "@com_github_google_pins_infra//:bazel/patches/gnmi-001-fix_virtual_proto_import.patch",
-            ],
-            sha256 = "2231e1cc398a523fa840810fa6fdb8960639f7b91b57bb8f12ed8681e0142a67",
-        )
-    if not native.existing_rule("com_github_gnoi"):
-        http_archive(
-            name = "com_github_gnoi",
-            # Newest commit on main on 2021-11-08.
-            url = "https://github.com/openconfig/gnoi/archive/1ece8ed91a0d5d283219a99eb4dc6c7eadb8f287.zip",
-            strip_prefix = "gnoi-1ece8ed91a0d5d283219a99eb4dc6c7eadb8f287",
-            sha256 = "991ff13a0b28f2cdc2ccb123261e7554d9bcd95c00a127411939a3a8c8a9cc62",
+            branch = "bazel-workspace-support-no-strip",
         )
     if not native.existing_rule("com_github_p4lang_p4c"):
         git_repository(
             name = "com_github_p4lang_p4c",
             remote = "https://github.com/p4lang/p4c",
-            branch = "bazel-workspace-support",
+            branch = "bazel-workspace-support-no-strip",
         )
     if not native.existing_rule("com_github_p4lang_p4runtime"):
-        git_repository(
+        http_archive(
             name = "com_github_p4lang_p4runtime",
-            remote = "https://github.com/p4lang/p4runtime",
-            branch = "bazel-workspace-support",
+            url = "https://github.com/p4lang/p4runtime/archive/bd2a626484e125da30422326d27fad0ddebdd645.tar.gz",
+            strip_prefix = "p4runtime-bd2a626484e125da30422326d27fad0ddebdd645/proto",
+            sha256 = "5cad9290fce6748ef3e76a857f9d2cb6747ec3540423a325eff61a718d464cfd",
         )
-    if not native.existing_rule("com_github_p4lang_p4_constraints"):
-        # This commit is from https://github.com/p4lang/p4-constraints/pull/177.
-        # TODO: b/445173612 - Remove Bazel build hacks and depend on a proper upstream branch.
+
+    if not native.existing_rule("rules_cc"):
         http_archive(
-            name = "com_github_p4lang_p4_constraints",
-            urls = ["https://github.com/p4lang/p4-constraints/archive/5b6ec72c61c9f69b1d62b58e170eb414c6748059.zip"],
-            strip_prefix = "p4-constraints-5b6ec72c61c9f69b1d62b58e170eb414c6748059",
+            name = "rules_cc",
+            sha256 = "b8b918a85f9144c01f6cfe0f45e4f2838c7413961a8ff23bc0c6cdf8bb07a3b6",
+            strip_prefix = "rules_cc-0.1.5",
+            url = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.5/rules_cc-0.1.5.tar.gz",
         )
-    if not native.existing_rule("com_jsoncpp"):
-        http_archive(
-            name = "com_jsoncpp",
-            url = "https://github.com/open-source-parsers/jsoncpp/archive/1.9.4.zip",
-            strip_prefix = "jsoncpp-1.9.4",
-            build_file = "@//:bazel/BUILD.jsoncpp.bazel",
-            sha256 = "6da6cdc026fe042599d9fce7b06ff2c128e8dd6b8b751fca91eb022bce310880",
-        )
-    if not native.existing_rule("com_gnu_gmp"):
-        http_archive(
-            name = "com_gnu_gmp",
-            urls = [
-                "https://gmplib.org/download/gmp/gmp-6.2.1.tar.xz",
-                "https://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz",
-            ],
-            strip_prefix = "gmp-6.2.1",
-            sha256 = "fd4829912cddd12f84181c3451cc752be224643e87fac497b69edddadc49b4f2",
-            build_file = "@//:bazel/BUILD.gmp.bazel",
-        )
+
+    # -- Dependencies needed by WORKSPACE.bazel --------------------------------
+    # These are loaded directly in the WORKSPACE file before transitive dep
+    # macros (like p4c_deps, protobuf_deps) get a chance to define them.
+
     if not native.existing_rule("rules_foreign_cc"):
         http_archive(
             name = "rules_foreign_cc",
             sha256 = "d54742ffbdc6924f222d2179f0e10e911c5c659c4ae74158e9fe827aad862ac6",
             strip_prefix = "rules_foreign_cc-0.2.0",
             url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.2.0.tar.gz",
+        )
+    if not native.existing_rule("com_github_nelhage_rules_boost"):
+        http_archive(
+            name = "com_github_nelhage_rules_boost",
+            url = "https://github.com/nelhage/rules_boost/archive/5160325dbdc8c9e499f9d9917d913f35f1785d52.zip",
+            strip_prefix = "rules_boost-5160325dbdc8c9e499f9d9917d913f35f1785d52",
+            sha256 = "feb4b1294684c79df7c1e08f1aec5da0da52021e33db59c88edbe86b4d1a017a",
         )
     if not native.existing_rule("rules_proto"):
         http_archive(
@@ -170,17 +110,7 @@ def p4_infra_deps():
         http_archive(
             name = "rules_pkg",
             urls = [
-                "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.5.1/rules_pkg-0.5.1.tar.gz",
-                "https://github.com/bazelbuild/rules_pkg/releases/download/0.5.1/rules_pkg-0.5.1.tar.gz",
+                "https://github.com/bazelbuild/rules_pkg/releases/download/0.7.0/rules_pkg-0.7.0.tar.gz",
             ],
-            sha256 = "a89e203d3cf264e564fcb96b6e06dd70bc0557356eb48400ce4b5d97c2c3720d",
-        )
-    if not native.existing_rule("com_google_ydf"):
-        http_archive(
-            name = "com_google_ydf",
-            urls = [
-                "https://github.com/google/yggdrasil-decision-forests/archive/50e3ef7d8e106f0021cab5fb94b230214f17ff94.zip",
-            ],
-            strip_prefix = "yggdrasil-decision-forests-50e3ef7d8e106f0021cab5fb94b230214f17ff94",
-            sha256 = "c5c0cd9924064a1c70356c2074e30e9fb7daaec6267d33fc58a1d0f4a99bc501",
+            sha256 = "8a298e832762eda1830597d64fe7db58178aa84cd5926d76d5b744d6558941c2",
         )
